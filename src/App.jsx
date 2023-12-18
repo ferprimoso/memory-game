@@ -9,7 +9,9 @@ function App() {
   const [pokemons, setPokemons] = useState([])
   const [difficult, setDifficult] = useState('easy')
   const [gameStarted, setGameStarted] = useState(false)
+  // const [lastFlippedCard, setLastFlippedCard] = useState(null)
 
+  let lastFlippedCard = null
 
   useEffect(() => {
     let numberOfPokemons = 0;
@@ -36,20 +38,26 @@ function App() {
         setPokemons(data);
       })
       .catch(error => console.error('Error fetching Pokemon data:', error));
+
+    console.log('pokegetted');
   }
 
 
   function ShuffledPokemonCards() {
     const allCards = pokemons.map(pokemon => (
       <PokemonCard
-        key={pokemon.id}
+        key={pokemon.id + ''}
+        id={pokemon.id + ''}
         pokemon={pokemon}
+        handleCardClicked={handleCardClicked}
       />
     ))
     allCards.push(pokemons.map(pokemon => (
       <PokemonCard
-        key={pokemon.id}
+        key={pokemon.id + 'copy'}
+        id={pokemon.id + 'copy'}
         pokemon={pokemon}
+        handleCardClicked={handleCardClicked}
       />
     )))
 
@@ -75,6 +83,16 @@ function App() {
 
   const startGame = () => {
     setGameStarted(true)
+  }
+
+  const handleCardClicked = (id) => {
+    if (lastFlippedCard !== id && lastFlippedCard === id.slice(0, 3)) {
+      console.log('you find the pair!')
+    } else {
+
+      console.log(id);
+      lastFlippedCard = id
+    }
   }
 
 

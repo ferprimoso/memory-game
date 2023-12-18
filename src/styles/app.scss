@@ -84,32 +84,30 @@ main {
 // 3 different grids by size
 .cards-grid {
     background-color: white;
-    border: 4px solid orange;
     width: 800px;
     height: 600px;
     display: grid;
-    grid-column-gap: 2px;
-    grid-row-gap: 2px;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
 
-    .easy {}
+    // .easy {}
 
-    .medium {
-        grid-template-columns: repeat(8, 1fr auto);
-        grid-template-rows: repeat(4, 1fr) auto;
-    }
+    // .medium {
+    //     grid-template-columns: repeat(8, 1fr auto);
+    //     grid-template-rows: repeat(4, 1fr) auto;
+    // }
 
-    .hard {
-        grid-template-columns: repeat(8, 1fr auto);
-        grid-template-rows: repeat(4, 1fr auto);
-    }
+    // .hard {
+    //     grid-template-columns: repeat(8, 1fr auto);
+    //     grid-template-rows: repeat(4, 1fr auto);
+    // }
 }
 
 .card {
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 1px solid black;
 
 
     .card-inner {

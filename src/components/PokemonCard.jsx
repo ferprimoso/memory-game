@@ -1,10 +1,15 @@
 import { useState } from "react"
 
-export default function PokemonCard({ pokemon }) {
+export default function PokemonCard({ id, pokemon, handleCardClicked }) {
     const [cardTurned, setCardTurned] = useState(false)
+    const [cardReveled, setCardReveled] = useState(false)
+
 
     const handleCardTurn = () => {
-        setCardTurned(!cardTurned)
+        if (!cardReveled) {
+            setCardTurned(true);
+            handleCardClicked(id)
+        }
     }
 
     return (
