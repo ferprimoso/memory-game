@@ -9,9 +9,10 @@ function App() {
   const [pokemons, setPokemons] = useState([])
   const [difficult, setDifficult] = useState('easy')
   const [gameStarted, setGameStarted] = useState(false)
-  // const [lastFlippedCard, setLastFlippedCard] = useState(null)
+  const [lastFlippedCard, setLastFlippedCard] = useState(null)
+  const [isClickable, setIsClickable] = useState(true)
+  const [findedPokemons, setFindedPokemons] = useState([])
 
-  let lastFlippedCard = null
 
   useEffect(() => {
     let numberOfPokemons = 0;
@@ -26,56 +27,39 @@ function App() {
 
 
   const getPokemons = (n) => {
+    const lastIds = []
     const endpoints = []
     for (let i = 0; i < n; i++) {
-      endpoints.push('https://pokeapi.co/api/v2/pokemon/' + Math.floor(Math.random() * 906))
+      let randomId = Math.floor(Math.random() * 649)
+
+      //check for duplicate pokemons id
+      while (lastIds.includes(randomId)) {
+        randomId = Math.floor(Math.random() * 649)
+      }
+
+      endpoints.push('https://pokeapi.co/api/v2/pokemon/' + randomId)
+      lastIds.push(randomId)
     }
 
     axios.all(endpoints.map(endpoint => axios.get(endpoint)))
       .then(responses => {
         // Extract data from each response
-        const data = responses.map(response => response.data);
+        const data = responses.map(response => ({ id: response.data.id.toString().padStart(3, '0'), content: response.data, isFlipped: false }));
+        data.push(...data.map(card => ({ ...card, id: card.id + 'pair' })))
+
+        //algorithm to shuffle the pokemons
+        for (var i = data.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var temp = data[i];
+          data[i] = data[j];
+          data[j] = temp;
+        }
         setPokemons(data);
       })
       .catch(error => console.error('Error fetching Pokemon data:', error));
 
     console.log('pokegetted');
   }
-
-
-  function ShuffledPokemonCards() {
-    const allCards = pokemons.map(pokemon => (
-      <PokemonCard
-        key={pokemon.id + ''}
-        id={pokemon.id + ''}
-        pokemon={pokemon}
-        handleCardClicked={handleCardClicked}
-      />
-    ))
-    allCards.push(pokemons.map(pokemon => (
-      <PokemonCard
-        key={pokemon.id + 'copy'}
-        id={pokemon.id + 'copy'}
-        pokemon={pokemon}
-        handleCardClicked={handleCardClicked}
-      />
-    )))
-
-    //algorithm to shuffle the cards
-    for (var i = allCards.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = allCards[i];
-      allCards[i] = allCards[j];
-      allCards[j] = temp;
-    }
-
-    return (
-      <>
-        {allCards}
-      </>
-    )
-  }
-
 
   const changeDifficult = (diff) => {
     setDifficult(diff);
@@ -85,14 +69,60 @@ function App() {
     setGameStarted(true)
   }
 
-  const handleCardClicked = (id) => {
-    if (lastFlippedCard !== id && lastFlippedCard === id.slice(0, 3)) {
-      console.log('you find the pair!')
-    } else {
+  const handleCardClicked = async (id) => {
+    console.log(pokemons);
 
-      console.log(id);
-      lastFlippedCard = id
+
+    console.log(id, lastFlippedCard);
+
+    if (findedPokemons.includes(id) || !isClickable || id === lastFlippedCard) {
+      return; // Clicking not allowed during delay
     }
+
+    setIsClickable(false); // Disable clicking during delay
+
+
+    console.log(id);
+
+    if (lastFlippedCard === null) {
+      setPokemons(pokemons.map((pokemon =>
+        pokemon.id === id ? { ...pokemon, isFlipped: !pokemon.isFlipped } : pokemon
+      )))
+      setLastFlippedCard(id)
+    } else {
+      // páir finded
+      if (lastFlippedCard !== id && lastFlippedCard.slice(0, 3) === id.slice(0, 3)) {
+        console.log('You find the pair!');
+        console.log(lastFlippedCard, id);
+        setPokemons(pokemons.map((pokemon =>
+          pokemon.id === id ? { ...pokemon, isFlipped: !pokemon.isFlipped } : pokemon
+        )))
+        setFindedPokemons([...findedPokemons, id, lastFlippedCard])
+        setLastFlippedCard(null)
+      } else {
+        //reset flipped cards and lastflippedcard
+        setPokemons(pokemons.map((pokemon =>
+          pokemon.id === id ? { ...pokemon, isFlipped: !pokemon.isFlipped } : pokemon
+        )))
+
+        // wait a second then flipp back
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+
+        setPokemons(pokemons.map((pokemon =>
+          (pokemon.id === lastFlippedCard) ? { ...pokemon, isFlipped: !pokemon.isFlipped } : pokemon
+        )))
+
+        setLastFlippedCard(null)
+      }
+    }
+
+
+    // Simulate a delay, e.g., 1000 milliseconds (1 second)
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Enable clicking again after the delay
+    setIsClickable(true);
   }
 
 
@@ -110,7 +140,19 @@ function App() {
           <div className="game-container">
             <div className='game-grid'>
               <div className={difficult === 'easy' ? 'cards-grid easy' : difficult === 'medium' ? 'cards-grid medium' : 'cards-grid hard'}>
-                <ShuffledPokemonCards />
+                {pokemons.map((pokemon) => (
+
+                  <PokemonCard
+                    key={pokemon.id}
+                    id={pokemon.id}
+                    pokemon={pokemon.content}
+                    isFlipped={pokemon.isFlipped}
+                    handleCardClicked={handleCardClicked}
+                  />
+                ))}
+
+
+                {/* <button onClick={() => console.log(pokemons)}></button> */}
               </div>
             </div>
           </div>
