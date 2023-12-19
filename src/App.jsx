@@ -176,7 +176,7 @@ function App() {
           <div className="game-container">
             <div className='game-header'>
               <div className='title-wrapper'>
-                <img src='src/assets/pokemonlogo.svg' alt="Pokemon Logo" />
+                <img src='/pokemonlogo.png' alt="Pokemon Logo" />
                 <h1>Memory Game</h1>
               </div>
               <h1 className='timer'>Time: {timer} </h1>

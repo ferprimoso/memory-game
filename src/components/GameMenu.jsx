@@ -2,7 +2,7 @@ export default function GameMenu({ children, startGame }) {
     return (
         <div className="game-menu">
             <div className="header">
-                <img src='src/assets/pokemonlogo.svg' alt="Pokemon Logo" />
+                <img src='/pokemonlogo.png' alt="Pokemon Logo" />
                 <h1>Memory Game</h1>
             </div>
 
