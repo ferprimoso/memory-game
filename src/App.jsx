@@ -4,14 +4,27 @@ import PokemonCard from './components/PokemonCard';
 import axios from 'axios';
 import GameMenu from './components/GameMenu';
 import Button from './components/Button';
+import Modal from './components/Modal';
+import GitHub from './components/Github';
 
 function App() {
-  const [pokemons, setPokemons] = useState([])
+  const [pokemons, setPokemons] = useState(null)
   const [difficult, setDifficult] = useState('easy')
   const [gameStarted, setGameStarted] = useState(false)
   const [lastFlippedCard, setLastFlippedCard] = useState(null)
   const [isClickable, setIsClickable] = useState(true)
   const [findedPokemons, setFindedPokemons] = useState([])
+  const [isGameWon, setIsGameWon] = useState(null);
+
+
+  //time r
+  const [timer, setTimer] = useState(0);
+  const [timerInterval, setTimerInterval] = useState(null);
+
+  useEffect(() => {
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(timerInterval);
+  }, [timerInterval]);
 
 
   useEffect(() => {
@@ -19,12 +32,28 @@ function App() {
     difficult === 'easy'
       ? (numberOfPokemons = 4)
       : difficult === 'medium'
-        ? (numberOfPokemons = 8)
+        ? (numberOfPokemons = 9)
         : (numberOfPokemons = 16);
 
     getPokemons(numberOfPokemons);
   }, [difficult]);
 
+  useEffect(() => {
+    if (pokemons && findedPokemons.length === pokemons.length) {
+      setIsGameWon(true);
+    }
+  }, [findedPokemons, pokemons]);
+
+  useEffect(() => {
+    if (isGameWon) {
+      // Perform actions when the game is won after the initial render
+      clearInterval(timerInterval); // Clear the interval when the game is won
+    }
+  }, [isGameWon, timer, timerInterval]);
+
+  // const closeModal = () => {
+  //   setIsGameWon(false);
+  // };
 
   const getPokemons = (n) => {
     const lastIds = []
@@ -67,22 +96,22 @@ function App() {
 
   const startGame = () => {
     setGameStarted(true)
+
+    setTimerInterval(
+      setInterval(() => {
+        setTimer((prevTimer) => prevTimer + 1);
+      }, 1000)
+    );
+
   }
 
+
   const handleCardClicked = async (id) => {
-    console.log(pokemons);
-
-
-    console.log(id, lastFlippedCard);
-
     if (findedPokemons.includes(id) || !isClickable || id === lastFlippedCard) {
       return; // Clicking not allowed during delay
     }
 
     setIsClickable(false); // Disable clicking during delay
-
-
-    console.log(id);
 
     if (lastFlippedCard === null) {
       setPokemons(pokemons.map((pokemon =>
@@ -99,6 +128,8 @@ function App() {
         )))
         setFindedPokemons([...findedPokemons, id, lastFlippedCard])
         setLastFlippedCard(null)
+
+        console.log(findedPokemons)
       } else {
         //reset flipped cards and lastflippedcard
         setPokemons(pokemons.map((pokemon =>
@@ -121,9 +152,14 @@ function App() {
     // Simulate a delay, e.g., 1000 milliseconds (1 second)
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+
     // Enable clicking again after the delay
     setIsClickable(true);
   }
+
+  const playAgain = () => {
+    window.location.reload();
+  };
 
 
   return (
@@ -138,8 +174,15 @@ function App() {
         )}
         {gameStarted && (
           <div className="game-container">
+            <div className='game-header'>
+              <div className='title-wrapper'>
+                <img src='src/assets/pokemonlogo.svg' alt="Pokemon Logo" />
+                <h1>Memory Game</h1>
+              </div>
+              <h1 className='timer'>Time: {timer} </h1>
+            </div>
             <div className='game-grid'>
-              <div className={difficult === 'easy' ? 'cards-grid easy' : difficult === 'medium' ? 'cards-grid medium' : 'cards-grid hard'}>
+              <div className={difficult === 'easy' ? 'cards-grid-easy' : difficult === 'medium' ? 'cards-grid-medium' : 'cards-grid-hard'}>
                 {pokemons.map((pokemon) => (
 
                   <PokemonCard
@@ -150,13 +193,14 @@ function App() {
                     handleCardClicked={handleCardClicked}
                   />
                 ))}
-
-
                 {/* <button onClick={() => console.log(pokemons)}></button> */}
               </div>
             </div>
           </div>
         )}
+        {isGameWon && <Modal playAgain={playAgain} time={timer} />}
+
+        <GitHub />
       </main>
 
     </>
