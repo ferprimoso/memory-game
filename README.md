@@ -1,8 +1,23 @@
-# React + Vite
+# Memory Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Memory Game React project with each pair of cards being a random pokemon. 
 
-Currently, two official plugins are available:
+## 💻 Built with
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Technologies used in the project:
+
+*   Vite + React
+*   Sass
+*   Pokemon Api
+
+
+## 🚀 Demo
+
+Click here to see the project in action => [Live Preview](https://luminous-gaufre-43da6f.netlify.app/) 
+
+<p align="center">
+  <img src="https://i.imgur.com/JFW9kNQ.png" width="600" alt="project pic">
+</p>
+<h2 align="center">
+</h2>
+
